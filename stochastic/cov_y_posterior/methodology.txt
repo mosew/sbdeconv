@@ -1,0 +1,6 @@
+Assume that we are regressing the FIRST DIFFERENCED signal yd.
+Then each signal has mean 0.
+
+V_{i,i+h} = V_{i+h,i} is the mean, order h autocovariance of the first-differenced output signals y.
+
+Each step is 5 minutes; we assume an 8-hour maximum window of influence, so that for h>96 we have 0 covariance.
