@@ -3,7 +3,7 @@
 %
 %
 
-function [JN,dJN] = JN_and_dJN_uspline(qc)
+function [JN,dJN] = J_gradJ(qc)
  
 
 % x(j+1) = Ax(j) + Bu(j)
@@ -79,6 +79,8 @@ assert(length(c)==P+1);
 testu = @(c) c*SplinesP_linear;
 total_u = [training_u;testu(c)];
 
+
+% DEFINE SYSTEM OPERATORS
 A = -M_state\(L+q1*K_state);
 B = M_state\[q2;zeros(N,1)];
 
@@ -89,7 +91,9 @@ Bhat = (Ahat - eye(N+1))*(A\B);
 dAhat_dq = zeros(N+1,N+1,2);
 dAhat_dq(:,:,1) = AdAExp(1:(N+1),(N+2):end);
 
-dBhat_dq = build_dBNhat_dq(A,Ahat,dAhat_dq,B);
+dBhat_dq = build_dBhat_dq(A,Ahat,dAhat_dq,B);
+
+
 
 X = zeros(N+1,n,m+1);
 

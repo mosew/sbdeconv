@@ -23,12 +23,14 @@ assert(all(size(training_u)==[m n]));
 assert(all(size(test_y)==[1 n]));
 assert(all(size(test_u)==[1 n]));
 
-% Set initial parameters
-q_init = ones(1,2);
-c_init = [ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
-lambda1_init = 5e-2;
-lambda2_init = 5e-2;
-parms_init = [q_init,c_init,lambda1_init,lambda2_init];
+% % Set initial parameters
+% Moved to globals
+% q_init = ones(1,2);
+% c_init = [ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
+% lambda1_init = 5e-2;
+% lambda2_init = 5e-2;
+% parms_init = [q_init,c_init,lambda1_init,lambda2_init];
+global q_init c_init lambda1_init lambda2_init parms_init
 
 % Options for constrained minimization
 % Fix first and last linear splines to be 0.
@@ -46,11 +48,11 @@ OPTIONS = optimoptions(@fmincon,'Display','iter',...
     'ScaleProblem','none',...
     'MaxIterations',1000,...
     'StepTolerance',eps,...
-    'Diagnostics','on',...
+    'Diagnostics','off',...
     'CheckGradients',false);
 
 % Constrained minimization        
-[parms_star,FVAL,EXITFLAG,OUTPUT] = fmincon(@JN_and_dJN_uspline,parms_init,Aineq,Bineq,Aeq,Beq,LB,UB,NONLCON,OPTIONS);
+[parms_star,FVAL,EXITFLAG,OUTPUT] = fmincon(@J_gradJ,parms_init,Aineq,Bineq,Aeq,Beq,LB,UB,NONLCON,OPTIONS);
 
         
 % Collect optimal parameters and deconvolved signal

@@ -54,17 +54,15 @@ addpath(genpath("."));
 % 	contains raw and processed data
 
 %%  preprocessing/ 
-% 	MATLAB scripts for preprocessing BrAC and TAC data from Excel
-% 	spreadsheet and .mat
-global DATA_FILEPATH
+% 	MATLAB scripts for preprocessing BrAC and TAC data .mat
+global DATA_FILEPATH nSPLHR
 DATA_FILEPATH = 'data\ZD_Data_5122.mat';
-% Later the PAD entries at the end of each episode will be dropped to
-% mitigate overshoot artifacts at end of each episode.
+nSPLHR = 1; % Approx number of splines to use per hour
 preprocess
 
 %% model/
 % 	Contains definitions of system operators and cost functional for optimization problem.
-JN_and_dJN_globals
+globals
 
 %% optimization/
 % 	Contains optimization function
@@ -76,7 +74,8 @@ global resultspath
 resultspath = 'data/1splhr_results_alt.mat';
 compile_my_results
 convert_results_to_arrays
+v = [L2_MSE,L2_MSE_sd,Linf_error_means,Linf_sd,AUC_MSE,AUC_MSE_sd,peak_time_MSE,peak_time_MSE_sd,peak_height_MSE,peak_height_MSE_sd]
 
 %% previous/
 % 	Contains methods of Rosen et al. for this problem, which optimizes over q, then u.
- 
+%load('rosenerrors.mat','rosenerrors')

@@ -25,7 +25,7 @@ global M_state L R K_state
     
 global P nSPLHR
 % P+1 splines/episode * 1 ep/n steps * 1step/5min * 60min/1hr = 60(P+1)/(5n) = 12(P+1)/n splines per hour
-% We'll use 1 splines per hour, giving P = n/12 - 1
+% We'll use 1 spline per hour, giving P = n/12 - 1
 P=round(n*nSPLHR/12)-1;
 
 global SplinesP_linear derivsP_linear
@@ -34,6 +34,8 @@ t=0:1/n:(1-(1/n));
 
 
 SplinesP_linear = zeros(P+1,n);
+derivsP_linear = zeros(P+1,n);
+
 for k=0:P
     linearfun = @(x)(x>(k-1)/P).*(x<=k/P).*(P*x-(k-1)) + (x>k/P).*(x<(k+1)/P).*(-P*x+k+1);
     for i = 1:n
@@ -42,22 +44,30 @@ for k=0:P
     end
 end
 
-global dAN_dq
-    dAN_dq = zeros(N+1,N+1,2);
-    dAN_dq(:,:,1) = -M_state\K_state;
-    % Second page is all zeros.
+global dA_dq
+    dA_dq = zeros(N+1,N+1,2);
+    dA_dq(:,:,1) = -M_state\K_state;
 
-global dBN_dq
-    dBN_dq = zeros(N+1,1,2);
-    dBN_dq(1,:,2) = 1;
-    dBN_dq(:,:,2) = M_state\dBN_dq(:,:,2);
+global dB_dq
+    dB_dq = zeros(N+1,1,2);
+    dB_dq(1,:,2) = 1;
+    dB_dq(:,:,2) = M_state\dB_dq(:,:,2);
     
-global CNhat
-    CNhat = [zeros(1,N),1];
+global Chat
+    Chat = [zeros(1,N),1];
 
 global ctou ctodu
 ctou = @(c) c*SplinesP_linear;
 ctodu = @(c) c*derivsP_linear;
+
+% Set initial parameters
+global q_init c_init lambda1_init lambda2_init parms_init
+    q_init = ones(1,2);
+    c_init = [ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
+    lambda1_init = 5e-2;
+    lambda2_init = 5e-2;
+    parms_init = [q_init,c_init,lambda1_init,lambda2_init];
+
     
 % Regularization
 global Reg dReg

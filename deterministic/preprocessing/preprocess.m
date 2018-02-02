@@ -9,16 +9,15 @@
 
 % %% Set preprocessing constants
 
-global DATA_FILEPATH PAD nSPLHR
+global DATA_FILEPATH PAD
 % If executing this file outside readme_exec.m, uncomment these.
 % matlabpath(pathdef);
 % DATA_FILEPATH = 'data\ZD_Data_5122.mat';
 
-nSPLHR = 1; % Approx number of splines to use per hour
 TAU_OUT = 5/60; % Number of hours between timesteps in spline fit
 PAD = 11; % Number of zeros to add to the beginning and end of each sample (equivalent to 5*PAD minutes)
-
-% Later the PAD entries at the end of each episode will be dropped to mitigate overshoot artifacts at end of each episode.
+% Later the PAD entries at the end of each episode will be dropped to
+% mitigate overshoot artifacts at end of each episode.
 
 %% Load original data
 load(DATA_FILEPATH,...
