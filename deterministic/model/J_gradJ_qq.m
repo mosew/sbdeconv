@@ -3,7 +3,7 @@
 %
 %
 
-function [JN,dJN] = J_gradJ(qc)
+function [JN,dJN] = J_gradJ_qq(qc)
  
 
 % x(j+1) = Ax(j) + Bu(j)
@@ -63,36 +63,45 @@ function [JN,dJN] = J_gradJ(qc)
 % we could define them here but then they'll be created every
 % time J is called.
 
-global N P K_state m n M_state L tau dA_dq
+global N P K_state m n M_state L tau dA_dq M
 global training_u Y Reg dReg
 global Chat SplinesP_linear
 
 % Process inputs
-q1 = qc(1);
-q2 = qc(2);
-
-% Scale system parameters
-c = qc(3:(end-2));
+q1 = qc(1:M+1);
+q2 = qc(M+2);
+c = qc(M+3:(end-2));
 lambda1 = qc(end-1);
 lambda2 = qc(end);
+
 assert(length(c)==P+1);
 testu = @(c) c*SplinesP_linear;
 total_u = [training_u;testu(c)];
 
 
 % DEFINE SYSTEM OPERATORS
-A = -M_state\(L+q1*K_state);
+vvv = zeros(N+1);
+for k = 1:M+1
+    vvv = vvv + q1(k)*K_state(:,:,k);
+end
+A = -M_state\(L+vvv);
 B = M_state\[q2;zeros(N,1)];
-
 
 mm = [tau*A, tau*dA_dq(:,:,1);zeros(N+1),tau*A];
 AdAExp = expm(mm);
 Ahat = AdAExp(1:(N+1),1:(N+1));
 Bhat = (Ahat - eye(N+1))*(A\B);
-dAhat_dq = zeros(N+1,N+1,2);
+
+dAhat_dq = zeros(N+1,N+1,M+2);
 dAhat_dq(:,:,1) = AdAExp(1:(N+1),(N+2):end);
 
-dBhat_dq = build_dBhat_dq(A,Ahat,dAhat_dq,B);
+for k = 2:M+1
+    mm = [tau*A, tau*dA_dq(:,:,k);zeros(N+1),tau*A];
+    AdAExp = expm(mm);
+    dAhat_dq(:,:,k) = AdAExp(1:(N+1),(N+2):end);
+end
+
+dBhat_dq = build_dBhat_dq_qq(A,Ahat,dAhat_dq,B);
 
 
 
@@ -115,7 +124,7 @@ end
 
 
 % COMPUTE GRADIENT CONTRIBUTIONS
-dJN = zeros(1,2+P+1+2); % one for each component of (q,c)
+dJN = zeros(1,M+1+1+P+1+2); % one for each component of (q,c)
 JN=0;
 
 % Adjoint method.
@@ -131,7 +140,7 @@ for j = 1:n
         % Gradient of system parameters
         sc = m*(i==m+1)+(i<=m);
         if j>1
-            for k = 1:2
+            for k = 1:M+2
                 dJN(k) = dJN(k) + sc*(eta(:,j,i)' * (dAhat_dq(:,:,k)*X(:,j-1,i) + dBhat_dq(:,:,k)*total_u(i,j-1)));
             end
         end

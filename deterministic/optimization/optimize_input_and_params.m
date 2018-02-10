@@ -35,7 +35,15 @@ global q_init c_init lambda1_init lambda2_init parms_init
 % Options for constrained minimization
 % Fix first and last linear splines to be 0.
 fixzeros = fix(n/(P*PAD));
-Aeq = [0,0,1,zeros(1,P-fixzeros),ones(fixzeros),0,0];
+
+if length(q_init)>2
+    global M
+    Aeq = [zeros(1,M+1),0,1,zeros(1,P-fixzeros),ones(fixzeros),0,0];
+else
+    M=0;
+    Aeq = [0,0,1,zeros(1,P-fixzeros),ones(fixzeros),0,0];
+end
+
 Beq = 0;
 Aineq = [];
 Bineq = [];
@@ -52,13 +60,17 @@ OPTIONS = optimoptions(@fmincon,'Display','iter',...
     'CheckGradients',false);
 
 % Constrained minimization        
-[parms_star,FVAL,EXITFLAG,OUTPUT] = fmincon(@J_gradJ,parms_init,Aineq,Bineq,Aeq,Beq,LB,UB,NONLCON,OPTIONS);
+if length(q_init)>2
+    [parms_star,FVAL,EXITFLAG,OUTPUT] = fmincon(@J_gradJ_qq,parms_init,Aineq,Bineq,Aeq,Beq,LB,UB,NONLCON,OPTIONS);
+else
+    [parms_star,FVAL,EXITFLAG,OUTPUT] = fmincon(@J_gradJ,parms_init,Aineq,Bineq,Aeq,Beq,LB,UB,NONLCON,OPTIONS);
+end
 
         
 % Collect optimal parameters and deconvolved signal
-q1_star = parms_star(1);
-q2_star = parms_star(2);
-u_star  = parms_star(3:(end-2))*SplinesP_linear;
+q1_star = parms_star(1:M+1);
+q2_star = parms_star(M+2);
+u_star  = parms_star(M+3:(end-2))*SplinesP_linear;
 u_star = u_star(1:n-PAD);
 lambda1_star = parms_star(end-1);
 lambda2_star = parms_star(end);
