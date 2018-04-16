@@ -8,12 +8,11 @@
 % arguments to be optimized. Therefore we define the known parameters of JN
 % and dJN as global variables.
 
-load('data\preprocessed.mat')
+load('data\preprocessed.mat','n','tau','nSPLHR')
 
 
 global N n tau
 N=32; % state and evolution operator discretization index  
-tau = 5/60;
 T = n*tau;
 
 global M_state L R K_state
@@ -24,9 +23,9 @@ global M_state L R K_state
     R = diag([1,zeros(1,N)]);
     
 global P nSPLHR
-% P+1 splines/episode * 1 ep/n steps * 1step/5min * 60min/1hr = 60(P+1)/(5n) = 12(P+1)/n splines per hour
-% We'll use 1 spline per hour, giving P = n/12 - 1
-P=round(n*nSPLHR/12)-1;
+% P+1 splines/episode * 1 ep/n steps * 1step/tau hr = (P+1)/(tau*n) splines per hour
+% We'll use nSPLHR splines per hour, giving
+P=round(n*nSPLHR*tau)-1;
 
 global SplinesP_linear derivsP_linear
 % (P+1) x n linear spline matrix
@@ -62,10 +61,10 @@ ctodu = @(c) c*derivsP_linear;
 
 % Set initial parameters
 global q_init c_init lambda1_init lambda2_init parms_init
-    q_init = ones(1,2);
+    q_init = [0.63,11.5];
     c_init = [ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
-    lambda1_init = 5e-2;
-    lambda2_init = 5e-2;
+    lambda1_init = 1e-4;
+    lambda2_init = 1e-4;
     parms_init = [q_init,c_init,lambda1_init,lambda2_init];
 
     

@@ -20,22 +20,17 @@ load('data/preprocessed.mat','u_total','y_total','kkkk','llll')
 h = figure;
 for i = 1:bsize(2)
     subplot(kkkk,llll,i)
-    tt = 1/12*(1:(size(u_total,2)-PAD));
-    plot(tt,u_total(i,PAD+1:end),'k--')
+    plot(u_total(i,PAD+1:end),'k--')
     hold on
-    plot(tt,y_total(i,PAD+1:end),'r.')
+    plot(y_total(i,PAD+1:end),'r.')
     for k = 1:bsize(1)
-        uu = b{k,i}.full_deconvolved_BrAC;
-        plot(1/12*(1:size(uu,2)),uu)
+        plot(b{k,i}.full_deconvolved_BrAC)
         if k == bsize(1)
-            xlabel('hours')
-            ylabel('100 * alcohol concentration (%)')
+            xlabel('minutes')
+            ylabel('ABV')
         end
     end
 end
-h.PaperPositionMode = 'auto';
-
-suptitle('Estimated BAC from TAC, artificially generated data')
 legend('BrAC','TAC','1 training','3 training','8 training')
 
 for para = 1:bsize(1)

@@ -42,7 +42,7 @@ data_BrAC_5122 = data_BrAC_5122(toUseIndex);
 global NUM_EPISODES
 NUM_EPISODES = 9;
 
-%% Pads the beginning and end of each training episode (sample) with PAD/12 hours of zeros
+%% Pads the beginning and end of each training episode (sample) with 60*PAD/tau hours of zeros
 % AND normalizes data
 for i = 1:length(data_BrAC_5122)
     t_TAC_5122{i} = [(-PAD:-1)/12, t_TAC_5122{i}, t_TAC_5122{i}(end)+(1:PAD)/12] + PAD/12;

@@ -21,3 +21,5 @@ ACVy(97:end)=0;
 csvwrite('acvy.csv',ACVy);
 figure
 plot(ACVy,'.')
+figure
+plot(parcorr(ACVy))

@@ -138,7 +138,11 @@ end
 for j = 1:n
     for i = 1:m+1
         % Gradient of system parameters
+        
+        % Scaling constant to decrease importance of system parameters
+        % relative to deconvolution
         sc = m*(i==m+1)+(i<=m);
+        
         if j>1
             for k = 1:M+2
                 dJN(k) = dJN(k) + sc*(eta(:,j,i)' * (dAhat_dq(:,:,k)*X(:,j-1,i) + dBhat_dq(:,:,k)*total_u(i,j-1)));

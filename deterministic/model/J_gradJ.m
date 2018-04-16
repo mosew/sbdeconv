@@ -63,7 +63,7 @@ function [JN,dJN] = J_gradJ(qc)
 % we could define them here but then they'll be created every
 % time J is called.
 
-global N P K_state m n M_state L tau dA_dq
+global N P K_state n M_state L tau dA_dq NUM_EPISODES
 global training_u Y Reg dReg
 global Chat SplinesP_linear
 
@@ -79,6 +79,7 @@ assert(length(c)==P+1);
 testu = @(c) c*SplinesP_linear;
 total_u = [training_u;testu(c)];
 
+m = size(training_u,1);
 
 % DEFINE SYSTEM OPERATORS
 A = -M_state\(L+q1*K_state);
@@ -129,7 +130,7 @@ end
 for j = 1:n
     for i = 1:m+1
         % Gradient of system parameters
-        sc = m*(i==m+1)+(i<=m);
+        sc = 1*(i==m+1)+(i<=m);
         if j>1
             for k = 1:2
                 dJN(k) = dJN(k) + sc*(eta(:,j,i)' * (dAhat_dq(:,:,k)*X(:,j-1,i) + dBhat_dq(:,:,k)*total_u(i,j-1)));

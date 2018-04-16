@@ -4,11 +4,11 @@
 
 function [q1_star,q2_star,u_star,lambda1_star,lambda2_star] = optimize_input_and_params(training,test,P)
 
-global SplinesP_linear PAD
+global SplinesP_linear PAD n
 
 load('data\preprocessed.mat','y_total','u_total','n','PAD')
 
-global m training_u Y
+global training_u Y
 % All begin at t=0.
 training_y = y_total(training,:);
 training_u = u_total(training,:);
@@ -34,27 +34,28 @@ global q_init c_init lambda1_init lambda2_init parms_init
 
 % Options for constrained minimization
 % Fix first and last linear splines to be 0.
-fixzeros = fix(n/(P*PAD));
+fixzeros = fix(PAD/n*(P+1));
 
-if length(q_init)>2
+
+if size(q_init,2)>2
     global M
-    Aeq = [zeros(1,M+1),0,1,zeros(1,P-fixzeros),ones(fixzeros),0,0];
+    Aeq = [zeros(1,M+1),0,1,zeros(1,P-fixzeros),ones(1,fixzeros),0,0];
 else
     M=0;
-    Aeq = [0,0,1,zeros(1,P-fixzeros),ones(fixzeros),0,0];
+    Aeq = [0,0,1,zeros(1,P-fixzeros),ones(1,fixzeros),0,0];
 end
 
 Beq = 0;
 Aineq = [];
 Bineq = [];
-LB = [eps*ones(size(q_init)),-eps*ones(size(c_init)),1e-9,1e-9];
-UB = [inf*ones(size(q_init)),inf*ones(size(c_init)),10,10];
+LB = [eps*ones(size(q_init)),-eps*ones(size(c_init)),0.9*lambda1_init,0.9*lambda2_init];
+UB = [inf*ones(size(q_init)),inf*ones(size(c_init)),1.1*lambda1_init,1.1*lambda2_init];
 NONLCON = [];
 OPTIONS = optimoptions(@fmincon,'Display','iter',...
     'Algorithm','interior-point',...
     'SpecifyObjectiveGradient',true,...
     'ScaleProblem','none',...
-    'MaxIterations',1000,...
+    'MaxIterations',2000,...
     'StepTolerance',eps,...
     'Diagnostics','off',...
     'CheckGradients',false);

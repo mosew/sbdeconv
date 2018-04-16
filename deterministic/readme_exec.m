@@ -57,8 +57,9 @@ addpath(genpath("."));
 % 	MATLAB scripts for preprocessing BrAC and TAC data .mat
 global DATA_FILEPATH nSPLHR
 DATA_FILEPATH = 'data\ZD_Data_5122.mat';
-nSPLHR = 1; % Approx number of splines to use per hour
-preprocess
+nSPLHR = 1; % Approx number of splines to use per hour, assuming time is measured in hours
+%preprocess
+generate_artificial_data
 
 %% model/
 % 	Contains definitions of system operators and cost functional for optimization problem.
@@ -71,7 +72,7 @@ globals
 % 	Calls function in optimization/ using model/ on data/preprocessed.mat and compiles error measures
 
 global resultspath
-resultspath = 'data/1splhr_results_alt.mat';
+resultspath = 'data/1splhr_results_artificial.mat';
 compile_my_results
 convert_results_to_arrays
 v = [L2_MSE,L2_MSE_sd,Linf_error_means,Linf_sd,AUC_MSE,AUC_MSE_sd,peak_time_MSE,peak_time_MSE_sd,peak_height_MSE,peak_height_MSE_sd]
