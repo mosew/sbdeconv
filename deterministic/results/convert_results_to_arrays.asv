@@ -12,25 +12,30 @@ peak_height_abs_errors = zeros(bsize);
 actual_errors = cell(bsize);
 full_deconvolved_BrACs = cell(bsize);
 trained_parameters = cell(bsize);
-lambda1s = zeros(bsize);
-lambda2s = zeros(bsize);
 
 
-load('data/preprocessed.mat','u_total','y_total','kkkk','llll')
+load('data/preprocessed.mat','u_total','y_total','kkkk','llll','q')
 h = figure;
 for i = 1:bsize(2)
     subplot(kkkk,llll,i)
-    plot(u_total(i,PAD+1:end),'k--')
+    tt = 1/12*(1:(size(u_total,2)));
+    plot(tt,u_total(i,:),'k--')
     hold on
-    plot(y_total(i,PAD+1:end),'r.')
+    plot(tt,y_total(i,PAD+1:end),'r.')
     for k = 1:bsize(1)
-        plot(b{k,i}.full_deconvolved_BrAC)
+        uu = b{k,i}.full_deconvolved_BrAC;
+        plot(1/12*(1:size(uu,2)),uu)
         if k == bsize(1)
-            xlabel('minutes')
-            ylabel('ABV')
+            xlabel('hours')
+            ylabel('100 * alcohol concentration (%)')
         end
+        ttext = ['q_1=',num2str(q(i,1)),', q_2=',num2str(q(i,2))];
+        title(ttext,'Interpreter','tex');
     end
 end
+h.PaperPositionMode = 'auto';
+
+suptitle('Estimated BAC from TAC, artificially generated data')
 legend('BrAC','TAC','1 training','3 training','8 training')
 
 for para = 1:bsize(1)
@@ -43,10 +48,7 @@ for para = 1:bsize(1)
         peak_height_abs_errors(para,test) = s.peak_height_abs_error;
         actual_errors{para,test} = s.actual_error;
         full_deconvolved_BrACs{para,test} = s.full_deconvolved_BrAC;
-        trained_parameters{para,test} = s.trained_parameters;
-        lambda1s(para,test) = s.trained_regularization_scale(1);
-        lambda2s(para,test) = s.trained_regularization_scale(2);        
-        
+        trained_parameters{para,test} = s.trained_parameters;        
         %subplot(kkkk,llll,test)
         %hold on
         %plot(s.full_deconvolved_BrAC)

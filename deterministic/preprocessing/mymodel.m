@@ -13,7 +13,7 @@ function mymodel = mymodel(q,u)
         Bhat = build_Bhat(A,Ahat,build_B(q2));
         state(:,1,j) = Ahat * state(:,1,j) + Bhat * u(j,1);
         for i = 2:n
-            state(:,i,j) = Ahat * state(:,i,j) + Bhat*u(j,i);
+            state(:,i,j) = Ahat * state(:,i-1,j) + Bhat*u(j,i-1);
             mymodel(j,i) = state(N+1,i,j);
         end
     end

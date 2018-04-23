@@ -1,7 +1,7 @@
 % Converts test results struct into MATLAB arrays.
 clear
 load('data\temp_results.mat','b')
-global PAD
+load('data\preprocessed.mat','t_out')
 
 bsize = size(b);
 L2_errors = zeros(bsize);
@@ -12,25 +12,26 @@ peak_height_abs_errors = zeros(bsize);
 actual_errors = cell(bsize);
 full_deconvolved_BrACs = cell(bsize);
 trained_parameters = cell(bsize);
-lambda1s = zeros(bsize);
-lambda2s = zeros(bsize);
+q1s = zeros(bsize);
+q2s = zeros(bsize);
 
 
-load('data/preprocessed.mat','u_total','y_total','kkkk','llll')
+load('data/preprocessed.mat','u_total','y_total','kkkk','llll','q')
 h = figure;
 for i = 1:bsize(2)
     subplot(kkkk,llll,i)
-    tt = 1/12*(1:(size(u_total,2)-PAD));
-    plot(tt,u_total(i,PAD+1:end),'k--')
+    plot(t_out,u_total(i,:),'k+')
     hold on
-    plot(tt,y_total(i,PAD+1:end),'r.')
+    plot(t_out,y_total(i,:),'r.')
     for k = 1:bsize(1)
         uu = b{k,i}.full_deconvolved_BrAC;
-        plot(1/12*(1:size(uu,2)),uu)
+        plot(t_out,uu)
         if k == bsize(1)
             xlabel('hours')
             ylabel('100 * alcohol concentration (%)')
         end
+        ttext = ['q_1=',num2str(q(i,1)),', q_2=',num2str(q(i,2))];
+        title(ttext,'Interpreter','tex');
     end
 end
 h.PaperPositionMode = 'auto';
@@ -48,10 +49,9 @@ for para = 1:bsize(1)
         peak_height_abs_errors(para,test) = s.peak_height_abs_error;
         actual_errors{para,test} = s.actual_error;
         full_deconvolved_BrACs{para,test} = s.full_deconvolved_BrAC;
-        trained_parameters{para,test} = s.trained_parameters;
-        lambda1s(para,test) = s.trained_regularization_scale(1);
-        lambda2s(para,test) = s.trained_regularization_scale(2);        
-        
+        trained_parameters{para,test} = s.trained_parameters; 
+        q1s(para,test) = s.trained_parameters(1);
+        q2s(para,test) = s.trained_parameters(2);
         %subplot(kkkk,llll,test)
         %hold on
         %plot(s.full_deconvolved_BrAC)

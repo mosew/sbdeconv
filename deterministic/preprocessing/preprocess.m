@@ -63,7 +63,7 @@ n = length(t_out);
 kkkk = fix(sqrt(NUM_EPISODES));
 llll = ceil(NUM_EPISODES/kkkk);
 
-save('data\preprocessed.mat','u_total','y_total','tau','n','PAD','NUM_EPISODES','nSPLHR','kkkk','llll');
+save('data\preprocessed.mat','u_total','y_total','t_out','tau','n','PAD','NUM_EPISODES','nSPLHR','kkkk','llll');
 
 %% Check data
 for i = 1:NUM_EPISODES

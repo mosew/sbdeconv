@@ -72,9 +72,7 @@ q1 = qc(1);
 q2 = qc(2);
 
 % Scale system parameters
-c = qc(3:(end-2));
-lambda1 = qc(end-1);
-lambda2 = qc(end);
+c = qc(3:end);
 assert(length(c)==P+1);
 testu = @(c) c*SplinesP_linear;
 total_u = [training_u;testu(c)];
@@ -116,7 +114,7 @@ end
 
 
 % COMPUTE GRADIENT CONTRIBUTIONS
-dJN = zeros(1,2+P+1+2); % one for each component of (q,c)
+dJN = zeros(1,2+P+1); % one for each component of (q,c)
 JN=0;
 
 % Adjoint method.
@@ -130,7 +128,7 @@ end
 for j = 1:n
     for i = 1:m+1
         % Gradient of system parameters
-        sc = 1*(i==m+1)+(i<=m);
+        sc = m*(i==m+1)+(i<=m);
         if j>1
             for k = 1:2
                 dJN(k) = dJN(k) + sc*(eta(:,j,i)' * (dAhat_dq(:,:,k)*X(:,j-1,i) + dBhat_dq(:,:,k)*total_u(i,j-1)));
@@ -144,7 +142,7 @@ for j = 1:n
     end
 end
 
-JN = JN/m + Reg(q1,c,lambda1,lambda2);
-dJN = dJN/m + dReg(q1,c,lambda1,lambda2);
+JN = JN/m + Reg(q1,c);
+dJN = dJN/m + dReg(q1,c);
 
 end

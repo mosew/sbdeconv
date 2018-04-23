@@ -1,11 +1,13 @@
 % Use past algorithm to deconvolve BrAC from TAC for comparison
 
+global tau
+load('data/preprocessed.mat','tau')
 bt = cell(1,9);
 rosenerrors = cell(1,9);
-tau = 5/60;
+%tau = 5/60;
 
 for i = 1:9
-    [test_u,bt{i},peak_est,peaktime_est,auc_est] = rosencode(rem(i+1,9)+1,i);    
+    [test_u,bt{i},peak_est,peaktime_est,auc_est] = rosencode_artif(rem(i+1,9)+1,i);    
     
     u_star = bt{i}(:,2);
     

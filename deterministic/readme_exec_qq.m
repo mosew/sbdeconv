@@ -57,7 +57,7 @@ addpath(genpath("."));
 % 	MATLAB scripts for preprocessing BrAC and TAC data .mat
 global DATA_FILEPATH nSPLHR
 DATA_FILEPATH = 'data\ZD_Data_5122.mat';
-nSPLHR = 1; % Approx number of splines to use per hour
+nSPLHR = 2; % Approx number of splines to use per hour
 preprocess
 
 %% model/

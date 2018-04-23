@@ -8,12 +8,18 @@
 % arguments to be optimized. Therefore we define the known parameters of JN
 % and dJN as global variables.
 
-load('data\preprocessed.mat','n','tau','nSPLHR')
+load('data\preprocessed.mat','n','tau','nSPLHR','N','T','PAD')
 
 
-global N n tau
+global N n tau T nSPLHR
+
+global P
+% P+1 splines/episode * 1 ep/n steps * 1step/tau hr = (P+1)/(tau*n) splines per hour
+% We'll use nSPLHR splines per hour, giving
+P=round(n*nSPLHR*tau)-1;
+
 N=32; % state and evolution operator discretization index  
-T = n*tau;
+%T = n*tau;
 
 global M_state L R K_state
     % LINEAR SPLINE MATRIX
@@ -22,14 +28,10 @@ global M_state L R K_state
     L = diag([zeros(1,N),1]);
     R = diag([1,zeros(1,N)]);
     
-global P nSPLHR
-% P+1 splines/episode * 1 ep/n steps * 1step/tau hr = (P+1)/(tau*n) splines per hour
-% We'll use nSPLHR splines per hour, giving
-P=round(n*nSPLHR*tau)-1;
 
 global SplinesP_linear derivsP_linear
 % (P+1) x n linear spline matrix
-t=0:1/n:(1-(1/n));
+%tt=0:1/n:(1-(1/n));
 
 
 SplinesP_linear = zeros(P+1,n);
@@ -60,15 +62,15 @@ ctou = @(c) c*SplinesP_linear;
 ctodu = @(c) c*derivsP_linear;
 
 % Set initial parameters
-global q_init c_init lambda1_init lambda2_init parms_init
-    q_init = [0.63,11.5];
-    c_init = [ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
-    lambda1_init = 1e-4;
-    lambda2_init = 1e-4;
-    parms_init = [q_init,c_init,lambda1_init,lambda2_init];
+global q_init c_init parms_init
+    q_init = [1,0.3];
+    c_init = 1*[ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
+    lambda1 = 4e-5;
+    lambda2 = 1e-6;
+    parms_init = [q_init,c_init];
 
     
 % Regularization
 global Reg dReg
-    Reg = @(q,c,lambda1,lambda2) lambda1*ctou(c)*ctou(c)' + lambda2*ctodu(c)*ctodu(c)';
-    dReg = @(q,c,lambda1,lambda2) [zeros(1,2), 2*c*(lambda1*(SplinesP_linear*SplinesP_linear')+lambda2*(derivsP_linear*derivsP_linear')),ctou(c)*ctou(c)',ctodu(c)*ctodu(c)'];
+    Reg = @(q,c) lambda1*ctou(c)*ctou(c)' + lambda2*ctodu(c)*ctodu(c)';
+    dReg = @(q,c) [zeros(1,2), 2*c*(lambda1*(SplinesP_linear*SplinesP_linear')+lambda2*(derivsP_linear*derivsP_linear'))];%,ctou(c)*ctou(c)',ctodu(c)*ctodu(c)'];
