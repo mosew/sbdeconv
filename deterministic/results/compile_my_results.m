@@ -16,7 +16,7 @@ catch
     preprocess
     load('data\preprocessed.mat')
 end
-global tau u_total n PAD P NUM_EPISODES
+global tau u_total P NUM_EPISODES N
 
 globals
 
@@ -24,7 +24,7 @@ test_us = u_total;%(:,1:end-PAD);
 
 %% Define cell array to hold results.
 fprintf('Creating empty cell array\n')
-b = cell(3,NUM_EPISODES);
+b = cell(5,NUM_EPISODES);
 fprintf('Done creating empty cell array\n')
 numRuns=numel(b);
 thisRun=0;
@@ -35,26 +35,38 @@ for i = 1:NUM_EPISODES
     
     test=i;
 
-    % For testing paradigms 1 through 5
-    % paradigm 1: testing on i, training on i+2 (wraparound)
-    % paradigm 2: testing on i, training on i+1 : i+4 (wraparound)
-    % paradigm 3: training on all except test episode
+%     % TEST 1
+%     % For testing paradigms 1 through 3
+%     % paradigm 1: testing on i, training on i+2 (wraparound)
+%     % paradigm 2: testing on i, training on i+1 : i+4 (wraparound)
+%     % paradigm 3: training on all except test episode
+%         
+%     for para = 1:3
+%         if para == 1
+%             training = rem(i+1,NUM_EPISODES)+1;
+%         end
+%         if para==2
+%             if i<=(NUM_EPISODES-5)
+%                 training = (i+1):i+4;
+%             else
+%                 training = [(i+1):min(i+4,NUM_EPISODES),1:(i+4-NUM_EPISODES)];
+%             end
+%         end
+%         if para == 3
+%             training = [1:(i-1),(i+1):NUM_EPISODES];
+%         end
+      
+    % TEST 2
+    % For testing paradigms 1 through 5, test on i, train on i+2,
+    % N=2^(para+1)
     
-    for para = 1:3
-        if para == 1
-            training = rem(i+1,NUM_EPISODES)+1;
-        end
-        if para==2
-            if i<=(NUM_EPISODES-5)
-                training = (i+1):i+4;
-            else
-                training = [(i+1):min(i+4,NUM_EPISODES),1:(i+4-NUM_EPISODES)];
-            end
-        end
-        if para == 3
-            training = [1:(i-1),(i+1):NUM_EPISODES];
-        end
-        
+    training = rem(i+1,NUM_EPISODES)+1;
+    for para = 1:5
+        N = 2^(1+para);
+        save('data\preprocessed.mat','N','-append')
+        globals
+
+
         % Run the minimization script and time it
         tic
         fprintf('Testing on P=%i, paradigm=%i, test episode=%i \n', P, para, test)
@@ -68,7 +80,7 @@ for i = 1:NUM_EPISODES
 
         % Collect data from the run
         %u_star = u_star(1:(end-PAD));
-        test_u = test_us(test);
+        test_u = test_us(test,:);
         [peak_est, peaktime_est] = max(u_star);
         [peak_act, peaktime_act] = max(test_u);
 

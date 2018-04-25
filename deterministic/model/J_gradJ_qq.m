@@ -70,13 +70,12 @@ global Chat SplinesP_linear
 % Process inputs
 q1 = qc(1:M+1);
 q2 = qc(M+2);
-c = qc(M+3:(end-2));
-lambda1 = qc(end-1);
-lambda2 = qc(end);
+c = qc((M+3):end);
 
 assert(length(c)==P+1);
 testu = @(c) c*SplinesP_linear;
 total_u = [training_u;testu(c)];
+m = size(training_u,1);
 
 
 % DEFINE SYSTEM OPERATORS

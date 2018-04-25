@@ -12,7 +12,7 @@ peak_height_abs_errors = zeros(bsize);
 actual_errors = cell(bsize);
 full_deconvolved_BrACs = cell(bsize);
 trained_parameters = cell(bsize);
-q1s = zeros(bsize);
+q1s = cell(bsize);
 q2s = zeros(bsize);
 
 
@@ -37,7 +37,7 @@ end
 h.PaperPositionMode = 'auto';
 
 suptitle('Estimated BAC from TAC, artificially generated data')
-legend('BrAC','TAC','1 training','3 training','8 training')
+legend('Simulated BAC','Simulated TAC','N=4','N=8','N=16','N=32','N=64')
 
 for para = 1:bsize(1)
     for test = 1:bsize(2)                    
@@ -50,8 +50,8 @@ for para = 1:bsize(1)
         actual_errors{para,test} = s.actual_error;
         full_deconvolved_BrACs{para,test} = s.full_deconvolved_BrAC;
         trained_parameters{para,test} = s.trained_parameters; 
-        q1s(para,test) = s.trained_parameters(1);
-        q2s(para,test) = s.trained_parameters(2);
+        q1s{para,test} = s.trained_parameters(1:end-1);
+        q2s(para,test) = s.trained_parameters(end);
         %subplot(kkkk,llll,test)
         %hold on
         %plot(s.full_deconvolved_BrAC)

@@ -18,7 +18,7 @@ global P
 % We'll use nSPLHR splines per hour, giving
 P=round(n*nSPLHR*tau)-1;
 
-N=32; % state and evolution operator discretization index  
+%N=32; % state and evolution operator discretization index  
 %T = n*tau;
 
 global M_state L R K_state

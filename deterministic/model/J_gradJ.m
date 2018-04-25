@@ -63,7 +63,7 @@ function [JN,dJN] = J_gradJ(qc)
 % we could define them here but then they'll be created every
 % time J is called.
 
-global N P K_state n M_state L tau dA_dq NUM_EPISODES
+global N P K_state n M_state L tau dA_dq m
 global training_u Y Reg dReg
 global Chat SplinesP_linear
 
