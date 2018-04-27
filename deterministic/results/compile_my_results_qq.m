@@ -24,7 +24,7 @@ test_us = u_total;
 
 %% Define cell array to hold results.
 fprintf('Creating empty cell array\n')
-b = cell(5,9);
+b = cell(1,NUM_EPISODES);
 fprintf('Done creating empty cell array\n')
 numRuns=numel(b);
 thisRun=0;
@@ -40,15 +40,15 @@ for i = 1:NUM_EPISODES
     % N=2^(para+1)
     
     training = rem(i+1,NUM_EPISODES)+1;
-    for para = 1:5
+    for para = 1:1
         N = 2^(1+para);
         save('data\preprocessed.mat','N','-append')
-        globals
+        globals_qq
         
         % Run the minimization script and time it
         tic
         fprintf('Testing on P=%i, paradigm=%i, test episode=%i \n', P, para, test)
-        [q1_star,q2_star,u_star,lambda1_star,lambda2_star] = optimize_input_and_params(training,test,P);
+        [q1_star,q2_star,u_star] = optimize_input_and_params(training,test,P);
         r=toc;
 
         thisRun = thisRun +1;
@@ -63,7 +63,7 @@ for i = 1:NUM_EPISODES
 
         % Define and collect struct of collected data
         fprintf('Filling in cell %i,%i\n\n',para,test);
-        b{para,test} = struct('tau',{tau},'P',{P},'M',{M},...
+        b{para,test} = struct('tau',{tau},'P',{P},'M',{M},'N',{N},...
                                  'training_episodes',{training},'test_episode',{test},...
                                  'trained_parameters',{[q1_star,q2_star]},...
                                  'full_deconvolved_BrAC',{u_star},...

@@ -58,7 +58,7 @@ addpath(genpath("."));
 global DATA_FILEPATH
 DATA_FILEPATH = 'data\ZD_Data_5122.mat';
 %nSPLHR = 2; % Approx number of splines to use per hour
-preprocess
+%preprocess
 
 %% model/
 % 	Contains definitions of system operators and cost functional for optimization problem.
@@ -70,13 +70,13 @@ globals_qq
 %% results/
 % 	Calls function in optimization/ using model/ on data/preprocessed.mat and compiles error measures
 global resultspath
-resultspath = 'data/3splhr_results_test3_person.mat';
+resultspath = 'data/3splhr_results_test4_person.mat';
 compile_my_results_qq
 convert_results_to_arrays
 v = [L2_MSE,L2_MSE_sd,Linf_error_means,Linf_sd,AUC_MSE,AUC_MSE_sd,peak_time_MSE,peak_time_MSE_sd,peak_height_MSE,peak_height_MSE_sd]
-q1v = [q(:,1)';q1s]
-q2v = [q(:,2)';q2s]
-save('data/3splhr_results_test3_person.mat','v','q1v','q2v');
+q1v = [q(:,1:end-1)';q1s']
+q2v = [q(:,end)';q2s']
+save('data/3splhr_results_test4_person.mat','v','q1v','q2v');
 %% previous/
 % 	Contains methods of Rosen et al. for this problem, which optimizes over q, then u.
 %load('rosenerrors.mat','rosenerrors')

@@ -32,7 +32,7 @@ fixzeros=nSPLHR;
 
 
 if size(q_init,2)>2
-    global M
+    M = size(q_init,2)-2;
     Aeq = diag([zeros(1,M+1),0,1,zeros(1,P-fixzeros),ones(1,fixzeros)]);
 else
     M=0;

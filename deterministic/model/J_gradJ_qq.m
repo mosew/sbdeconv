@@ -63,7 +63,7 @@ function [JN,dJN] = J_gradJ_qq(qc)
 % we could define them here but then they'll be created every
 % time J is called.
 
-global N P K_state m n M_state L tau dA_dq M
+global N P m n M_state L tau dA_dq M
 global training_u Y Reg dReg
 global Chat SplinesP_linear
 
@@ -79,22 +79,19 @@ m = size(training_u,1);
 
 
 % DEFINE SYSTEM OPERATORS
-vvv = zeros(N+1);
-for k = 1:M+1
-    vvv = vvv + q1(k)*K_state(:,:,k);
-end
-A = -M_state\(L+vvv);
+Kq = build_Kq(q1);
+A = -M_state\(L+Kq);
 B = M_state\[q2;zeros(N,1)];
 
-mm = [tau*A, tau*dA_dq(:,:,1);zeros(N+1),tau*A];
+mm = [tau*A, tau*dA_dq(:,:,M+2);zeros(N+1),tau*A];
 AdAExp = expm(mm);
 Ahat = AdAExp(1:(N+1),1:(N+1));
 Bhat = (Ahat - eye(N+1))*(A\B);
 
 dAhat_dq = zeros(N+1,N+1,M+2);
-dAhat_dq(:,:,1) = AdAExp(1:(N+1),(N+2):end);
+dAhat_dq(:,:,M+2) = AdAExp(1:(N+1),(N+2):end);
 
-for k = 2:M+1
+for k = 1:M+1
     mm = [tau*A, tau*dA_dq(:,:,k);zeros(N+1),tau*A];
     AdAExp = expm(mm);
     dAhat_dq(:,:,k) = AdAExp(1:(N+1),(N+2):end);
@@ -123,7 +120,7 @@ end
 
 
 % COMPUTE GRADIENT CONTRIBUTIONS
-dJN = zeros(1,M+1+1+P+1+2); % one for each component of (q,c)
+dJN = zeros(1,M+1+1+P+1); % one for each component of (q,c)
 JN=0;
 
 % Adjoint method.
@@ -140,8 +137,8 @@ for j = 1:n
         
         % Scaling constant to decrease importance of system parameters
         % relative to deconvolution
-        sc = m*(i==m+1)+(i<=m);
         
+        sc = m*(i==m+1)+(i<=m);
         if j>1
             for k = 1:M+2
                 dJN(k) = dJN(k) + sc*(eta(:,j,i)' * (dAhat_dq(:,:,k)*X(:,j-1,i) + dBhat_dq(:,:,k)*total_u(i,j-1)));
@@ -151,11 +148,11 @@ for j = 1:n
     end
     
     for r=0:P
-        dJN(r+3) = dJN(r+3) + sc*(eta(:,j,m+1)'*Bhat*SplinesP_linear(r+1,j));
+        dJN(r+M+3) = dJN(r+M+3) + sc*(eta(:,j,m+1)'*Bhat*SplinesP_linear(r+1,j));
     end
 end
 
-JN = JN/m + Reg(q1,c,lambda1,lambda2);
-dJN = dJN/m + dReg(q1,c,lambda1,lambda2);
+JN = JN/m + Reg([q1,q2],c);
+dJN = dJN/m + dReg([q1,q2],c);
 
 end

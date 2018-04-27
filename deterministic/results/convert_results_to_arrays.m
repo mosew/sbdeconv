@@ -30,8 +30,9 @@ for i = 1:bsize(2)
             xlabel('hours')
             ylabel('100 * alcohol concentration (%)')
         end
-        ttext = ['q_1=',num2str(q(i,1)),', q_2=',num2str(q(i,2))];
+        ttext = ['q_1=',num2str(q(i,1)),'x+',num2str(q(i,2)),', q_2=',num2str(q(i,3))];
         title(ttext,'Interpreter','tex');
+        ylim([0,1.3*max(u_total(i,:))]);
     end
 end
 h.PaperPositionMode = 'auto';
