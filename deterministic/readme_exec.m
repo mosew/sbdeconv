@@ -57,7 +57,7 @@ addpath(genpath("."));
 % 	MATLAB scripts for preprocessing BrAC and TAC data .mat
 global DATA_FILEPATH
 DATA_FILEPATH = 'data\ZD_Data_5122.mat';
-%nSPLHR = 6; % Approx number of splines to use per hour, assuming time is measured in hours
+%nSPLHR = 2; % Approx number of splines to use per hour, assuming time is measured in hours
 %preprocess
 %generate_artificial_data
 
@@ -72,14 +72,14 @@ globals
 % 	Calls function in optimization/ using model/ on data/preprocessed.mat and compiles error measures
 
 global resultspath
-resultspath = 'data/P_N8_M0.mat';
+resultspath = 'data/actual_M0_P2_N8.mat';
 compile_my_results
 convert_results_to_arrays
 %v = [L2_MSE,L2_MSE_sd,Linf_error_means,Linf_sd,AUC_MSE,AUC_MSE_sd,peak_time_MSE,peak_time_MSE_sd,peak_height_MSE,peak_height_MSE_sd]
 v = [L2_MSE,Linf_error_means,AUC_MSE,peak_time_abs_meanerr,peak_height_abs_meanerr]
 q1v = [q(:,1)';cell2mat(q1s)]
 q2v = [q(:,2)';q2s]
-save('data/P_N8_M0.mat','v','q1v','q2v','-append');
+save('data/actual_M0_P2_N8.mat','v','q1v','q2v','-append');
 
 %% previous/
 % 	Contains methods of Rosen et al. for this problem, which optimizes over q, then u.

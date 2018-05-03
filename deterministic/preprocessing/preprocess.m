@@ -40,7 +40,7 @@ data_TAC_5122 = data_TAC_5122(toUseIndex);
 data_BrAC_5122 = data_BrAC_5122(toUseIndex);
 
 global NUM_EPISODES
-NUM_EPISODES = 4;
+NUM_EPISODES = 9;
 
 %% Pads the beginning and end of each training episode (sample) with 60*PAD/tau hours of zeros
 % AND normalizes data
@@ -64,11 +64,11 @@ kkkk = fix(sqrt(NUM_EPISODES));
 llll = ceil(NUM_EPISODES/kkkk);
 T = t_out(end);
 
-u_total = u_total(1:4,1:150);
-y_total = y_total(1:4,1:150);
-n=150;
+u_total = u_total(:,1:145);
+y_total = y_total(:,1:145);
+n=145;
 t_out = t_out(1:n);
-T = t_out(150);
+T = t_out(145);
 
 save('data\preprocessed.mat','u_total','y_total','t_out','tau','n','T','PAD','NUM_EPISODES','nSPLHR','kkkk','llll','-append');
 

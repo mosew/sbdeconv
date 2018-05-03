@@ -82,11 +82,11 @@ ctodu = @(c) c*derivsP_linear;
 global q_init c_init parms_init
     %s = 10^((log2(N)-1)/4);
     %q_init = [2*s,1*s,.3];
-    q_init = [ones(1,M+1),.3];
+    q_init = 0.03*[ones(1,M+1),.5];
     if numel(q_init)>2
         assert(numel(q_init)==M+2);
     end
-    c_init = 1*[ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
+    c_init = 0*[ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
 %     lambda1 = 2e-2;
 %     lambda2 = 4e-3;
     lambda1 = 2e-4;
@@ -98,8 +98,8 @@ global Reg dReg
     %Reg = @(q,c) lambda1*ctou(c)*ctou(c)' + lambda2*ctodu(c)*ctodu(c)';
     %dReg = @(q,c) [zeros(1,M+2), 2*c*(lambda1*(SplinesP_linear*SplinesP_linear')+lambda2*(derivsP_linear*derivsP_linear'))];
 
-    %lambda3 = 3e-3;
-    lambda3 = 1e-4;
+    lambda3 = 3e-3;
+    %lambda3 = 1e-4;
 
     M_q = 1/(6*M) * gallery('tridiag',ones(1,M),[2,4*ones(1,M-1),2],ones(1,M)); % [<psi^N_i,psi^N_j>]_{ij}
     K_q = M * gallery('tridiag',-ones(1,M),[1,2*ones(1,M-1),1],-ones(1,M));

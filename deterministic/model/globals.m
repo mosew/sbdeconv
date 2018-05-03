@@ -63,14 +63,14 @@ ctodu = @(c) c*derivsP_linear;
 
 % Set initial parameters
 global q_init c_init parms_init lambda1 lambda2 lambda3
-    q_init = [0.85,0.5];
+    q_init = [1,0.3];
     c_init = 0*[ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
-    %lambda1 = 3e-2; % these values good for real data I guess
-    %lambda2 = 2e-3;
-    lambda1 = 2e-4;
-    lambda2 = 1e-5;
+    lambda1 = 8e-2;
+    lambda2 = 1e-4;
+%     lambda1 = 2e-4;
+%     lambda2 = 1e-5;
     parms_init = [q_init,c_init];
-    lambda3 = 1e-4;
+    lambda3 = 5e-4;
     
 % Regularization
 global Reg dReg

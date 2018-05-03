@@ -71,13 +71,13 @@ globals_qq
 %% results/
 % 	Calls function in optimization/ using model/ on data/preprocessed.mat and compiles error measures
 global resultspath
-resultspath = 'data/2splhr_results_test4.mat';
+resultspath = 'data/M_N8_P2.mat';
 compile_my_results_qq
 convert_results_to_arrays
-v = [L2_MSE,L2_MSE_sd,Linf_error_means,Linf_sd,AUC_MSE,AUC_MSE_sd,peak_time_MSE,peak_time_MSE_sd,peak_height_MSE,peak_height_MSE_sd]
+v = [L2_MSE,Linf_error_means,AUC_MSE,peak_time_abs_meanerr,peak_height_abs_meanerr]
 q1true = q(:,1:end-1);
 q2true = q(:,end);
-save('data/2splhr_results_test4.mat','v','q1true','q2true','q1s','q2s','-append');
+save('data/M_N8_P2.mat','v','q1true','q2true','q1s','q2s','-append');
 %% previous/
 % 	Contains methods of Rosen et al. for this problem, which optimizes over q, then u.
 %load('rosenerrors.mat','rosenerrors')

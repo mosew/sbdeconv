@@ -91,7 +91,7 @@ end
 h.PaperPositionMode = 'auto';
 set(0,'defaultTextInterpreter','latex')
 suptitle('Estimated BAC from TAC, artificially generated TAC, N=8, $q_1=1$, $q_2=.3$, $\lambda_1=.0002$, $\lambda_2=.00001$')
-
+%legend('BrAC','Simulated TAC','M=1', 'M=2', 'M=4', 'M=8')
 %legend('BrAC','Simulated TAC','2 spl/hr', '3 spl/hr', '4 spl/hr', '6 spl/hr')
 %legend('BrAC','Simulated TAC','N=4','N=8','N=16','N=32','N=64')
-%legend('BrAC','Simulated TAC','1 training','3 training','8 training')
+legend('BrAC','Simulated TAC','1 training','3 training','8 training')
