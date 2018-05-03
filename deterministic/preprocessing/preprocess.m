@@ -9,16 +9,16 @@
 
 % %% Set preprocessing constants
 
-global DATA_FILEPATH PAD
+global DATA_FILEPATH PAD nSPLHR N
 % If executing this file outside readme_exec.m, uncomment these.
 % matlabpath(pathdef);
-% DATA_FILEPATH = 'data\ZD_Data_5122.mat';
+DATA_FILEPATH = 'data\ZD_Data_5122.mat';
 
 TAU_OUT = 5/60; % Number of hours between timesteps in spline fit
-PAD = 11; % Number of zeros to add to the beginning and end of each sample (equivalent to 5*PAD minutes)
+PAD = 12; % Number of zeros to add to the beginning and end of each sample (equivalent to 5*PAD minutes)
 % Later the PAD entries at the end of each episode will be dropped to
 % mitigate overshoot artifacts at end of each episode.
-
+nSPLHR = 2;
 %% Load original data
 load(DATA_FILEPATH,...
      't_TAC_5122','t_BrAC_5122','data_TAC_5122','data_BrAC_5122');
@@ -40,7 +40,7 @@ data_TAC_5122 = data_TAC_5122(toUseIndex);
 data_BrAC_5122 = data_BrAC_5122(toUseIndex);
 
 global NUM_EPISODES
-NUM_EPISODES = 9;
+NUM_EPISODES = 4;
 
 %% Pads the beginning and end of each training episode (sample) with 60*PAD/tau hours of zeros
 % AND normalizes data
@@ -62,8 +62,15 @@ tau = TAU_OUT;
 n = length(t_out);
 kkkk = fix(sqrt(NUM_EPISODES));
 llll = ceil(NUM_EPISODES/kkkk);
+T = t_out(end);
 
-save('data\preprocessed.mat','u_total','y_total','t_out','tau','n','PAD','NUM_EPISODES','nSPLHR','kkkk','llll');
+u_total = u_total(1:4,1:150);
+y_total = y_total(1:4,1:150);
+n=150;
+t_out = t_out(1:n);
+T = t_out(150);
+
+save('data\preprocessed.mat','u_total','y_total','t_out','tau','n','T','PAD','NUM_EPISODES','nSPLHR','kkkk','llll','-append');
 
 %% Check data
 for i = 1:NUM_EPISODES
@@ -75,4 +82,4 @@ end
 suptitle('Preprocessed data')
 legend('BrAC','TAC')
 
-clear
+%clear

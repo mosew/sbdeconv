@@ -98,7 +98,7 @@ dBhat_dq = build_dBhat_dq(A,Ahat,dAhat_dq,B);
 X = zeros(N+1,n,m+1);
 
 for i = 1:m+1
-    X(:,1,i) = Bhat*total_u(i,1);
+    X(:,1,i) = 0;%Bhat*total_u(i,1); assumed u(i,1)=0.
     for j = 2:n
         X(:,j,i) = Ahat*X(:,j-1,i) + Bhat*total_u(i,j-1);
     end
@@ -146,7 +146,7 @@ for j = 1:n
     end
 end
 
-JN = JN/m + Reg(q1,c);
-dJN = dJN/m + dReg(q1,c);
+JN = JN/m + Reg([q1,q2],c);
+dJN = dJN/m + dReg([q1,q2],c);
 
 end

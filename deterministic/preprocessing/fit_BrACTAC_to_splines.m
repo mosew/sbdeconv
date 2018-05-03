@@ -46,5 +46,5 @@ y_total=zeros(m_total,n_out);
 % Generate, evaluate, restrict>=0 splines.
 for i = 1:m_total
     y_total(i,:)=max(interp1(t_TAC{i},data_TAC{i},time_out,'linear','extrap'),0);
-    u_total(i,:)=max(interp1(t_BrAC{i},data_BrAC{i},time_out,'linear','extrap'),0);
+    u_total(i,:)=max(interp1(t_BrAC{i},data_BrAC{i},time_out,'spline','extrap'),0);
 end

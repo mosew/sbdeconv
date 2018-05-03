@@ -4,7 +4,6 @@ function mymodel = mymodel_qq(q,u)
     n = size(u,2);
     state = zeros(N+1,n,m);
     mymodel = zeros(m,n);
-    
 
     for j = 1:m
         q1 = q(j,1:end-1);

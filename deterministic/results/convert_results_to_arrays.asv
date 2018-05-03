@@ -52,8 +52,8 @@ logAUC_MSE = mean(AUC_abs_errors,2);
 L2_MSE = mean(L2_errors,2);
 Linf_error_means = mean(Linf_errors,2);
 AUC_MSE = mean(AUC_abs_errors,2);
-peak_time_abs_meanerr = mean(peak_time_abs_errors,2);
-peak_height_abs_meanerr = mean(peak_height_abs_errors,2);
+peak_time_MSE = mean(peak_time_abs_errors,2);
+peak_height_MSE = mean(peak_height_abs_errors,2);
 
 L2_MSE_sd = std(L2_errors,0,2);
 logL2_sd = std(logL2_errors,0,2);
@@ -76,8 +76,9 @@ for i = 1:bsize(2)
     for k = 1:bsize(1)
         uu = b{k,i}.full_deconvolved_BrAC;
         plot(t_out,uu)
-%         hold on
-%         plot(t_out,mymodel([q1s{k,i},q2s(k,i)],uu),'gx');
+        hold on
+        if k==
+        plot(t_out,mymodel([q1s{k,i},q2s(k,i)],uu),'gx');
         if k == bsize(1)
             xlabel('hours')
             ylabel('$10 \times$ alcohol concentration (\%)')
@@ -90,8 +91,7 @@ for i = 1:bsize(2)
 end
 h.PaperPositionMode = 'auto';
 set(0,'defaultTextInterpreter','latex')
-suptitle('Estimated BAC from TAC, artificially generated TAC, N=8, $q_1=1$, $q_2=.3$, $\lambda_1=.0002$, $\lambda_2=.00001$')
+suptitle('Estimated BAC from TAC, artificially generated TAC, 2 splines/hr, $q_1=1$, $q_2=.3$, $\lambda_1=.0002$, $\lambda_2=.00004$')
+legend('BAC','Simulated TAC','N=4','N=8','N=16','N=32','N=64')
+%legend('BAC','Simulated TAC','1 training','3 training','8 training')
 
-%legend('BrAC','Simulated TAC','2 spl/hr', '3 spl/hr', '4 spl/hr', '6 spl/hr')
-%legend('BrAC','Simulated TAC','N=4','N=8','N=16','N=32','N=64')
-%legend('BrAC','Simulated TAC','1 training','3 training','8 training')

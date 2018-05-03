@@ -18,7 +18,7 @@ global P
 % We'll use nSPLHR splines per hour, giving
 P=round(n*nSPLHR*tau)-1;
 
-%N=32; % state and evolution operator discretization index  
+N=8; % state and evolution operator discretization index  
 %T = n*tau;
 
 global M_state L R K_state
@@ -62,15 +62,17 @@ ctou = @(c) c*SplinesP_linear;
 ctodu = @(c) c*derivsP_linear;
 
 % Set initial parameters
-global q_init c_init parms_init
-    q_init = [1,0.3];
-    c_init = 1*[ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
-    lambda1 = 4e-5;
-    lambda2 = 1e-6;
+global q_init c_init parms_init lambda1 lambda2 lambda3
+    q_init = [0.85,0.5];
+    c_init = 0*[ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
+    %lambda1 = 3e-2; % these values good for real data I guess
+    %lambda2 = 2e-3;
+    lambda1 = 2e-4;
+    lambda2 = 1e-5;
     parms_init = [q_init,c_init];
-
+    lambda3 = 1e-4;
     
 % Regularization
 global Reg dReg
-    Reg = @(q,c) lambda1*ctou(c)*ctou(c)' + lambda2*ctodu(c)*ctodu(c)';
-    dReg = @(q,c) [zeros(1,2), 2*c*(lambda1*(SplinesP_linear*SplinesP_linear')+lambda2*(derivsP_linear*derivsP_linear'))];%,ctou(c)*ctou(c)',ctodu(c)*ctodu(c)'];
+    Reg = @(q,c) lambda1*ctou(c)*ctou(c)' + lambda2*ctodu(c)*ctodu(c)' + lambda3*(q(1)+q(2));
+    dReg = @(q,c) [lambda3,lambda3, 2*c*(lambda1*(SplinesP_linear*SplinesP_linear')+lambda2*(derivsP_linear*derivsP_linear'))];%,ctou(c)*ctou(c)',ctodu(c)*ctodu(c)'];

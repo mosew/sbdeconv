@@ -8,7 +8,7 @@
 % arguments to be optimized. Therefore we define the known parameters of JN
 % and dJN as global variables.
 
-load('data\preprocessed.mat','n','tau','nSPLHR','N','T','PAD')
+load('data\preprocessed.mat','n','tau','nSPLHR','N','T','PAD','M')
 
 
 global N n tau T nSPLHR
@@ -17,9 +17,6 @@ global P
 % P+1 splines/episode * 1 ep/n steps * 1step/tau hr = (P+1)/(tau*n) splines per hour
 % We'll use nSPLHR splines per hour, giving
 P=round(n*nSPLHR*tau)-1;
-
-global M
-M = 7;
 
 SplineHandles = cell(1,M+1);
 for k=0:M
@@ -78,20 +75,22 @@ global Chat
     Chat = [zeros(1,N),1];
 
 global ctou ctodu
-ctou = @(c) c*M_u;
-ctodu = @(c) c*K_u;
+ctou = @(c) c*SplinesP_linear;
+ctodu = @(c) c*derivsP_linear;
 
 % Set initial parameters
 global q_init c_init parms_init
     %s = 10^((log2(N)-1)/4);
     %q_init = [2*s,1*s,.3];
-    q_init = [1*ones(1,M+1),1];
+    q_init = [ones(1,M+1),.3];
     if numel(q_init)>2
         assert(numel(q_init)==M+2);
     end
     c_init = 1*[ones(1,fix(P/3)),zeros(1,P+1-fix(P/3))];
-    lambda1 = 1e-4;
-    lambda2 = 1e-8;
+%     lambda1 = 2e-2;
+%     lambda2 = 4e-3;
+    lambda1 = 2e-4;
+    lambda2 = 1e-5;
     parms_init = [q_init,c_init];
 
 % Regularization
@@ -99,8 +98,10 @@ global Reg dReg
     %Reg = @(q,c) lambda1*ctou(c)*ctou(c)' + lambda2*ctodu(c)*ctodu(c)';
     %dReg = @(q,c) [zeros(1,M+2), 2*c*(lambda1*(SplinesP_linear*SplinesP_linear')+lambda2*(derivsP_linear*derivsP_linear'))];
 
-    lambda3 = 1;
+    %lambda3 = 3e-3;
+    lambda3 = 1e-4;
+
     M_q = 1/(6*M) * gallery('tridiag',ones(1,M),[2,4*ones(1,M-1),2],ones(1,M)); % [<psi^N_i,psi^N_j>]_{ij}
     K_q = M * gallery('tridiag',-ones(1,M),[1,2*ones(1,M-1),1],-ones(1,M));
-    Reg = @(q,c) lambda1*ctou(c)*ctou(c)' + lambda2*ctodu(c)*ctodu(c)' + lambda3*(q(1:end-1)*M_q)*(q(1:end-1)*M_q)' + lambda3*(q(1:end-1)*K_q)*(q(1:end-1)*K_q)';
-    dReg = @(q,c) [2*q(1:end-1)*lambda3*(M_q*M_q'+K_q*K_q'),0, 2*c*(lambda1*(SplinesP_linear*SplinesP_linear')+lambda2*(derivsP_linear*derivsP_linear'))];
+    Reg = @(q,c) lambda1*ctou(c)*ctou(c)' + lambda2*ctodu(c)*ctodu(c)' + lambda3*(q(1:end-1)*M_q)*(q(1:end-1)*M_q)';
+    dReg = @(q,c) [2*q(1:end-1)*lambda3*(M_q*M_q'),0, 2*c*(lambda1*(SplinesP_linear*SplinesP_linear')+lambda2*(derivsP_linear*derivsP_linear'))];

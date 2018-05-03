@@ -24,7 +24,7 @@ test_us = u_total;
 
 %% Define cell array to hold results.
 fprintf('Creating empty cell array\n')
-b = cell(1,NUM_EPISODES);
+b = cell(4,NUM_EPISODES);
 fprintf('Done creating empty cell array\n')
 numRuns=numel(b);
 thisRun=0;
@@ -34,15 +34,37 @@ rtTot=0;
 for i = 1:NUM_EPISODES
     
     test=i;
+%     % TEST 1
+%     % For testing paradigms 1 through 3
+%     % paradigm 1: testing on i, training on i+2 (wraparound)
+%     % paradigm 2: testing on i, training on i+1 : i+4 (wraparound)
+%     % paradigm 3: training on all except test episode
+%         
+%     for para = 1:3
+%         if para == 1
+%             training = rem(i+1,NUM_EPISODES)+1;
+%         end
+%         if para==2
+%             if i<=(NUM_EPISODES-5)
+%                 training = (i+1):i+4;
+%             else
+%                 training = [(i+1):min(i+4,NUM_EPISODES),1:(i+4-NUM_EPISODES)];
+%             end
+%         end
+%         if para == 3
+%             training = [1:(i-1),(i+1):NUM_EPISODES];
+%         end
 
     % TEST 3
     % For testing paradigms 1 through 5, test on i, train on i+2,
     % N=2^(para+1)
     
-    training = rem(i+1,NUM_EPISODES)+1;
-    for para = 1:1
-        N = 2^(1+para);
-        save('data\preprocessed.mat','N','-append')
+    training = 1;%rem(i+1,NUM_EPISODES)+1;
+    Ms = [1,2,4,8];
+    for para = 1:4
+        %N = 2^(1+para);
+        M = Ms(para);
+        save('data\preprocessed.mat','M','-append')
         globals_qq
         
         % Run the minimization script and time it
@@ -68,7 +90,7 @@ for i = 1:NUM_EPISODES
                                  'trained_parameters',{[q1_star,q2_star]},...
                                  'full_deconvolved_BrAC',{u_star},...
                                  'actual_error',{u_star-test_u},...
-                                 'L2_error',{tau^2*norm(u_star-test_u,2)},...
+                                 'L2_error',{tau*norm(u_star-test_u,2)},...
                                  'Linf_error',{max(abs(u_star-test_u))},...
                                  'AUC_abs_error',{tau*abs(trapz(u_star)-trapz(test_u))},...
                                  'peak_time_abs_error',{tau*abs(peaktime_est-peaktime_act)},...

@@ -72,13 +72,14 @@ globals
 % 	Calls function in optimization/ using model/ on data/preprocessed.mat and compiles error measures
 
 global resultspath
-resultspath = 'data/3splhr_results_test2_person.mat';
+resultspath = 'data/P_N8_M0.mat';
 compile_my_results
 convert_results_to_arrays
-v = [L2_MSE,L2_MSE_sd,Linf_error_means,Linf_sd,AUC_MSE,AUC_MSE_sd,peak_time_MSE,peak_time_MSE_sd,peak_height_MSE,peak_height_MSE_sd]
-q1v = [q(:,1)';q1s]
+%v = [L2_MSE,L2_MSE_sd,Linf_error_means,Linf_sd,AUC_MSE,AUC_MSE_sd,peak_time_MSE,peak_time_MSE_sd,peak_height_MSE,peak_height_MSE_sd]
+v = [L2_MSE,Linf_error_means,AUC_MSE,peak_time_abs_meanerr,peak_height_abs_meanerr]
+q1v = [q(:,1)';cell2mat(q1s)]
 q2v = [q(:,2)';q2s]
-save('data/3splhr_results_test2_person.mat','v','q1v','q2v');
+save('data/P_N8_M0.mat','v','q1v','q2v','-append');
 
 %% previous/
 % 	Contains methods of Rosen et al. for this problem, which optimizes over q, then u.
