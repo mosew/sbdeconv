@@ -1,5 +1,5 @@
 function y = delaymodel(a0,a1,b1,ell,u,t)
-    global N
+    global N n
     MN = build_MN(ell);
     n = length(t);
     y = zeros(1,n);

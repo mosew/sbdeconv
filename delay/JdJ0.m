@@ -2,17 +2,14 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
     % INPUTS
     % parmsu: 1 x 4+N+1 matrix of a0,a1,b1,ell,linear spline coefficients for unknown u
     % tru: m x N+1 matrix of linear spline coefficients for training u
-    % trY: m x 4N+1 matrix of sampled outputs (this is assuming the system is
-    %       discrete-time with timestep T/(4N) and u(0)=0)
+    % trY: (m+1) x 4N+1 matrix of sampled outputs (this is assuming the system is
+    %       discrete-time with timestep T/(4N))
 
-    global ctou T N n
+    global ctou N n h
     global Reg dReg USplLin
 
     [m,~]=size(tru);
     
-    n = 4*N;
-    h = T/n;
-
     
     % Process inputs
     a0 = parmsu(1);
@@ -24,7 +21,7 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
     
     MN = build_MN(ell);
     
-    total_u = [ctou(tru);ctou(u)];
+    total_u = [tru;ctou(u)'];
 
     % DEFINE SYSTEM OPERATORS
     KN = build_KN(a0,a1,b1);
@@ -35,34 +32,33 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
     %sg = @(s) expm(s*AN);
     %sgh = sg(h);
 
-    dA_dq  = zeros(2*N+1,2*N+1,4);
-    dA_dq(:,:,1) = MN\build_KN(1,a1,b1);
-    dA_dq(:,:,2) = MN\build_KN(a0,1,b1);
-    dA_dq(:,:,3) = MN\build_KN(a0,a1,1);
-    dA_dq(:,:,4) = build_MN(1)\build_KN(a0,a1,b1);
+    dAN_dq  = zeros(2*N+1,2*N+1,4);
+    dAN_dq(:,:,1) = MN\build_KN(1,a1,b1);
+    dAN_dq(:,:,2) = MN\build_KN(a0,1,b1);
+    dAN_dq(:,:,3) = MN\build_KN(a0,a1,1);
+    dAN_dq(:,:,4) = build_MN(1)\build_KN(a0,a1,b1);
     
-    dAhat_dq = zeros(N+1,N+1,4);
+    dAhat_dq = zeros(2*N+1,2*N+1,4);
 
     for k = 1:4
-        mm = [h*AN, h*dA_dq(:,:,k);zeros(N+1),h*AN];
-        AdAExp = expm(mm);
-        dAhat_dq(:,:,k) = AdAExp(1:(N+1),(N+2):end);
+        AdAExp = expm([h*AN, h*dAN_dq(:,:,k);zeros(2*N+1),h*AN]);
+        dAhat_dq(:,:,k) = AdAExp(1:(2*N+1),(2*N+2):end);
     end
-    Ahat = AdAExp(1:(N+1),1:(N+1));
-    Bhat = (Ahat - eye(N+1))*(AN\BN);
+    Ahat = AdAExp(1:(2*N+1),1:(2*N+1));
+    Bhat = AN\(Ahat - eye(2*N+1))*BN;
     dBhat_dq = build_dBhat_dq(AN,dAN_dq,Ahat,dAhat_dq,BN);
 
-    X = zeros(N+1,n,m+1);
+    X = zeros(2*N+1,n,m+1);
     
     for i = 1:m+1
         X(:,1,i) = 0;% assumed u(i,1)=0, and initial state=0;
         for j = 2:n
-            X(:,j,i) = sgh*X(:,j-1,i) + Bhat*u(i,j-1);
+            X(:,j,i) = Ahat*X(:,j-1,i) + Bhat*total_u(i,j-1);
         end
     end
 
     % INITIALIZE ETA
-    eta = zeros(N+1,n,m+1);
+    eta = zeros(2*N+1,n,m+1);
     % goes from t=h to t=h*n. At t=0, everything is 0...
     for i = 1:m+1
         % episodes in Y are assumed to start at 0.
@@ -71,13 +67,13 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
 
 
     % COMPUTE GRADIENT CONTRIBUTIONS
-    dJN = zeros(1,2+N+1); % one for each component of (q,c)
+    dJN = zeros(1,4+N+1); % one for each component of (q,c)
     JN=0;
 
     % Adjoint method.
     for j=(n-1):-1:1
         for i=1:m+1
-            eta(:,j,i) = sgh' * eta(:,j+1,i) + (CN*X(:,j,i)-trY(i,j))*CN';
+            eta(:,j,i) = Ahat' * eta(:,j+1,i) + (CN*X(:,j,i)-trY(i,j))*CN';
         end
     end
 
@@ -99,7 +95,7 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
         end
 
         for r=0:N
-            dJN(r+3) = dJN(r+3) + sc*(eta(:,j,m+1)'*Bhat*USplLin(j,r+1));
+            dJN(r+5) = dJN(r+5) + sc*(eta(:,j,m+1)'*Bhat*USplLin(j,r+1));
         end
     end
 
