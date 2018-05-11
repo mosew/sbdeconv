@@ -1,11 +1,11 @@
-function y = delaymodel(a0,a1,b1,ell,u,t)
+function y = delaymodel(a0,a1,ell,u,t)
     global N n
     MN = build_MN(ell);
     n = length(t);
     y = zeros(1,n);
     assert(size(t,1)==1);
 
-    KN = build_KN(a0,a1,b1);
+    KN = build_KN(a0,a1);
     AN = MN\KN;
     BN = [zeros(1,N+1),2*N/ell,zeros(1,N-1)]';
     CN = [1,zeros(1,2*N)]*MN;

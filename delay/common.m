@@ -2,18 +2,18 @@
 
 
 global N T n h
-N = 16;
+N = 8;
 T = 30;
 n = 4*N+1;
 h = T/(n-1);
 
 global q_init c_init parms_init
-q_init = [-0.06,-0.2,0.04,0.7];
+q_init = [-0.3,-0.7,8];
 c_init = eps*ones(1,N+1);
 parms_init = [q_init,c_init];
 
-lambda1 = 0;%;1;
-lambda2 = 0;%0.002;
+lambda1 = 1e-2;
+lambda2 = 1e-1;
 lambda3 = 1e-10;
 
 global scrKN scrKNm scrMNdell scrMNmdell ctou USplLin dUSplLin
@@ -36,5 +36,5 @@ ctou = @(c) USplLin*c';
 ctodu = @(c) dUSplLin*c';
 
 global Reg dReg
-Reg = @(q,c) lambda1*ctou(c)'*ctou(c) + lambda2*ctodu(c)'*ctodu(c) + lambda3*(q(1)+q(2)+q(3)+q(4));
-dReg = @(q,c) [lambda3,lambda3,lambda3,lambda3, 2*c*(lambda1*(USplLin'*USplLin)+lambda2*(dUSplLin'*dUSplLin))];
+Reg = @(q,c) lambda1*ctou(c)'*ctou(c) + lambda2*ctodu(c)'*ctodu(c) + lambda3*(q(1)+q(2)+q(3));
+dReg = @(q,c) [lambda3,lambda3,lambda3, 2*c*(lambda1*(USplLin'*USplLin)+lambda2*(dUSplLin'*dUSplLin))];

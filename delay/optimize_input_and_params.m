@@ -2,7 +2,7 @@
 %                       Main optimization routine
 %
 
-function [a0_star,a1_star,b1_star,ell_star,u_star] = optimize_input_and_params(training_u,training_y,test_y)
+function [a0_star,a1_star,ell_star,u_star] = optimize_input_and_params(training_u,training_y,test_y)
 
 global n ctou
 global c_init parms_init
@@ -20,8 +20,8 @@ Aeq = [];
 Beq = [];
 Aineq = [];
 Bineq = [];
-LB = [-10,-10,0,0,-eps*ones(size(c_init))];
-UB = [0,0,10,10,1000*ones(size(c_init))];
+LB = [-10,-10,0,-eps*ones(size(c_init))];
+UB = [0,0,11,1000*ones(size(c_init))];
 NONLCON = [];
 OPTIONS = optimoptions(@fmincon,'Display','iter',...
     'Algorithm','interior-point',...
@@ -39,8 +39,7 @@ JdJ = @(parms) JdJ0(parms,training_u,[training_y;test_y]);
 % Collect optimal parameters and deconvolved signal
 a0_star = parms_star(1);
 a1_star = parms_star(2);
-b1_star = parms_star(3);
-ell_star = parms_star(4);
-u_star  = ctou(parms_star(5:end));
+ell_star = parms_star(3);
+u_star  = ctou(parms_star(4:end));
 
 end
