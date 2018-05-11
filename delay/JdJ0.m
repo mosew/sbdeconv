@@ -1,9 +1,8 @@
 function [JN,dJN] = JdJ0(parmsu,tru,trY)
     % INPUTS
     % parmsu: 1 x 4+N+1 matrix of a0,a1,b1,ell,linear spline coefficients for unknown u
-    % tru: m x N+1 matrix of linear spline coefficients for training u
-    % trY: (m+1) x 4N+1 matrix of sampled outputs (this is assuming the system is
-    %       discrete-time with timestep T/(4N))
+    % tru: m x n matrix of linear spline coefficients for training u
+    % trY: (m+1) x n matrix of sampled outputs
 
     global ctou N n h
     global Reg dReg USplLin
@@ -28,6 +27,7 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
     AN = MN\KN;
     BN = [zeros(1,N+1),2*N/ell,zeros(1,N-1)]';
     CN = [1,zeros(1,2*N)]*MN;
+
     
     %sg = @(s) expm(s*AN);
     %sgh = sg(h);
@@ -36,7 +36,7 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
     dAN_dq(:,:,1) = MN\build_KN(1,a1,b1);
     dAN_dq(:,:,2) = MN\build_KN(a0,1,b1);
     dAN_dq(:,:,3) = MN\build_KN(a0,a1,1);
-    dAN_dq(:,:,4) = build_MN(1)\build_KN(a0,a1,b1);
+    dAN_dq(:,:,4) = -MN\(build_MN(1)*AN);
     
     dAhat_dq = zeros(2*N+1,2*N+1,4);
 
@@ -45,8 +45,8 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
         dAhat_dq(:,:,k) = AdAExp(1:(2*N+1),(2*N+2):end);
     end
     Ahat = AdAExp(1:(2*N+1),1:(2*N+1));
-    Bhat = AN\(Ahat - eye(2*N+1))*BN;
-    dBhat_dq = build_dBhat_dq(AN,dAN_dq,Ahat,dAhat_dq,BN);
+    Bhat = (Ahat - eye(2*N+1))*(AN\BN);
+    dBhat_dq = build_dBhat_dq(AN,dAN_dq,Ahat,dAhat_dq,BN,ell);
 
     X = zeros(2*N+1,n,m+1);
     
@@ -84,8 +84,8 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
 
             % Scaling constant to decrease importance of system parameters
             % relative to deconvolution
-
             sc = m*(i==m+1)+(i<=m);
+            
             if j>1
                 for k = 1:4
                     dJN(k) = dJN(k) + sc*(eta(:,j,i)' * (dAhat_dq(:,:,k)*X(:,j-1,i) + dBhat_dq(:,:,k)*total_u(i,j-1)));

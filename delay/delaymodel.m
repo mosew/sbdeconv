@@ -10,10 +10,17 @@ function y = delaymodel(a0,a1,b1,ell,u,t)
     BN = [zeros(1,N+1),2*N/ell,zeros(1,N-1)]';
     CN = [1,zeros(1,2*N)]*MN;
     
-    model = @(r,u) integral(@(s) model0(r-s,AN,BN,CN).*u(s), 0,r);
-    
-    for i = 1:n
-        y(i) = model(t(i),u);
+    if length(u)==1
+        model = @(r,u) integral(@(s) model0(r-s,AN,BN,CN).*u(s), 0,r);
+        for i = 1:n
+            y(i) = model(t(i),u);
+        end
+    else
+        for j = 2:n
+            for k = 1:j
+                y(j) = y(j)+CN*sg(t(j)-t(k),AN)*BN*u(k);
+            end
+        end
     end
 end
 
