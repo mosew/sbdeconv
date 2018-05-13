@@ -3,17 +3,17 @@
 
 global N T n h
 % N = 32;
-% T = 40;
+% T = 16;
 % n = 4*N+1;
 % h = T/(n-1);
 
 global q_init c_init parms_init
-q_init = [-0.7,3];
-c_init = 0.1*ones(1,N+1);
+q_init = [-0.7,5];
+c_init = eps*ones(1,N+1);
 parms_init = [q_init,c_init];
 
-lambda1 = 0.05;
-lambda2 = 0.1;
+lambda1 = 0.;
+lambda2 = 0.6;
 lambda3 = 1e-10;
 
 global scrKN scrKNm scrMNdell scrMNmdell ctou USplLin dUSplLin

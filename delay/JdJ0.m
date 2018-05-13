@@ -12,9 +12,8 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
     
     % Process inputs
     a0 = parmsu(1);
-    a1 = parmsu(2);
-    ell = parmsu(3);
-    u = parmsu(4:end);
+    ell = parmsu(2);
+    u = parmsu(3:end);
     % CAREFUL TO SCALE DATA IF NECESSARY
     
     MN = build_MN(ell);
@@ -22,7 +21,7 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
     total_u = [tru;ctou(u)'];
 
     % DEFINE SYSTEM OPERATORS
-    KN = build_KN(a0,a1);
+    KN = build_KN(a0);
     AN = MN\KN;
     BN = [zeros(1,N+1),2*N/ell,zeros(1,N-1)]';
     CN = [1,zeros(1,2*N)]*MN;
@@ -31,14 +30,13 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
     %sg = @(s) expm(s*AN);
     %sgh = sg(h);
 
-    dAN_dq  = zeros(2*N+1,2*N+1,4);
-    dAN_dq(:,:,1) = MN\build_KN(1,a1);
-    dAN_dq(:,:,2) = MN\build_KN(a0,1);
-    dAN_dq(:,:,3) = -MN\(build_MN(1)*AN);
+    dAN_dq  = zeros(2*N+1,2*N+1,2);
+    dAN_dq(:,:,1) = MN\build_KN(1);
+    dAN_dq(:,:,2) = -MN\((build_MN(1)-diag([1,zeros(1,2*N)]))*AN);
     
-    dAhat_dq = zeros(2*N+1,2*N+1,3);
+    dAhat_dq = zeros(2*N+1,2*N+1,2);
 
-    for k = 1:3
+    for k = 1:2
         AdAExp = expm([h*AN, h*dAN_dq(:,:,k);zeros(2*N+1),h*AN]);
         dAhat_dq(:,:,k) = AdAExp(1:(2*N+1),(2*N+2):end);
     end
@@ -65,7 +63,7 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
 
 
     % COMPUTE GRADIENT CONTRIBUTIONS
-    dJN = zeros(1,3+N+1); % one for each component of (q,c)
+    dJN = zeros(1,2+N+1); % one for each component of (q,c)
     JN=0;
 
     % Adjoint method.
@@ -85,7 +83,7 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
             sc = m*(i==m+1)+(i<=m);
             
             if j>1
-                for k = 1:3
+                for k = 1:2
                     dJN(k) = dJN(k) + sc*(eta(:,j,i)' * (dAhat_dq(:,:,k)*X(:,j-1,i) + dBhat_dq(:,:,k)*total_u(i,j-1)));
                 end
             end
@@ -93,11 +91,11 @@ function [JN,dJN] = JdJ0(parmsu,tru,trY)
         end
 
         for r=0:N
-            dJN(r+4) = dJN(r+4) + sc*(eta(:,j,m+1)'*Bhat*USplLin(j,r+1));
+            dJN(r+3) = dJN(r+3) + sc*(eta(:,j,m+1)'*Bhat*USplLin(j,r+1));
         end
     end
 
-    JN = JN/m + Reg([a0,a1,ell],u);
-    dJN = dJN/m + dReg([a0,a1,ell],u);
+    JN = JN/m + Reg([a0,ell],u);
+    dJN = dJN/m + dReg([a0,ell],u);
     
 end
